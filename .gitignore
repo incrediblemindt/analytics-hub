@@ -1,0 +1,10 @@
+# ignore everything by default
+*
+
+# allow these files/folders
+!.gitignore
+!requirements.txt
+!.github/
+!scripts/
+!scripts/daily_tiktok_pull.py
+!README.md
