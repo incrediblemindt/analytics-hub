@@ -1,0 +1,29 @@
+name: TikTok Daily Pull
+
+on:
+  schedule:
+    - cron: "10 12 * * *"  # daily 12:10 UTC (7:10am Chicago standard)
+  workflow_dispatch: {}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install -r requirements.txt
+
+      - name: Run daily TikTok pull
+        env:
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+          GCP_SERVICE_ACCOUNT_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+        run: |
+          echo "$GCP_SERVICE_ACCOUNT_JSON" > gcp.json
+          export GOOGLE_APPLICATION_CREDENTIALS=$PWD/gcp.json
+          python scripts/daily_tiktok_pull.py
