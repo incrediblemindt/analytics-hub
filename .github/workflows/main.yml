@@ -1,30 +1,69 @@
-name: TikTok Daily Pull
+name: AnalyticsHub Daily ETL
 
 on:
   schedule:
-    - cron: "10 12 * * *"  # daily 12:10 UTC (7:10am Chicago standard)
+    - cron: "10 12 * * *"  # 12:10 UTC
   workflow_dispatch: {}
 
 jobs:
   run:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - uses: actions/setup-python@v5
+
+    # ----------------------------------------
+    # Setup
+    # ----------------------------------------
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
         python-version: "3.11"
-    
-    - run: pip install -r requirements.txt
-    
-    - name: Auth to GCP (service account JSON)
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    # ----------------------------------------
+    # Google Cloud
+    # ----------------------------------------
+
+    - name: Auth to GCP
       uses: google-github-actions/auth@v2
       with:
         credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
-    
-    - name: Run daily TikTok pull
+
+    # ----------------------------------------
+    # TikTok
+    # ----------------------------------------
+
+    - name: Run TikTok ETL
       env:
         TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
         TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
         TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
       run: python scripts/daily_tiktok_pull.py
+
+    # ----------------------------------------
+    # Instagram
+    # ----------------------------------------
+
+    - name: Run Instagram ETL
+      env:
+        INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+        INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+      run: python scripts/daily_instagram_pull.py
+
+    # ----------------------------------------
+    # YouTube
+    # ----------------------------------------
+
+    - name: Run YouTube ETL
+      env:
+        YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+        YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+        YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+        YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
+      run: python scripts/daily_youtube_pull.py
