@@ -2,3 +2,4 @@ requests
 google-cloud-bigquery
 pandas
 numpy
+python-dotenv
