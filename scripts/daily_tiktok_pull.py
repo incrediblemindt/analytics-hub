@@ -48,6 +48,10 @@ def insert_rows(table_name, rows):
 
     print(f"Loaded {len(rows)} rows into {table_name}.")
 
+def execute_query(sql):
+    job = bq_client.query(sql)
+    job.result()
+    
 # ----------------------------
 # TikTok Auth
 # ----------------------------
