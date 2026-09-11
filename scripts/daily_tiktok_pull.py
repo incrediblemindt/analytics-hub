@@ -34,18 +34,19 @@ print("BQ Client Project:", bq_client.project)
 def insert_rows(table_name, rows):
     table_id = f"{PROJECT_ID}.{DATASET_CORE}.{table_name}"
 
-    errors = bq_client.insert_rows_json(table_id, rows)
+    job_config = bigquery.LoadJobConfig(
+        write_disposition=bigquery.WriteDisposition.WRITE_APPEND
+    )
 
-    if errors:
-        print(f"Errors inserting into {table_name}:")
-        print(errors)
-    else:
-        print(f"Inserted {len(rows)} rows into {table_name}")
+    job = bq_client.load_table_from_json(
+        rows,
+        table_id,
+        job_config=job_config
+    )
 
-
-def execute_query(sql):
-    job = bq_client.query(sql)
     job.result()
+
+    print(f"Loaded {len(rows)} rows into {table_name}.")
 
 # ----------------------------
 # TikTok Auth
