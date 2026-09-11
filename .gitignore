@@ -7,4 +7,6 @@
 !.github/
 !scripts/
 !scripts/daily_tiktok_pull.py
+!scripts/daily_instagram_pull.py
+!scripts/daily_youtube_pull.py
 !README.md
